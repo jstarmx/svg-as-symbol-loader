@@ -53,27 +53,6 @@ module.exports = function(content) {
 		el = el.nextSibling;
 	}
 
-	// Append unique prefix to all used 'id' attributes to make them unique in the universe
-	var nodesWithId = xpath.select('/*/*[@id]', targetDoc);
-	if (nodesWithId.length > 0) {
-		// Generate unique prefix
-		var hashFn = crypto.createHash('sha1');
-		hashFn.update(content);
-		var prefix = hashFn.digest('hex');
-
-		// Apply prefix to found nodes
-		nodesWithId.forEach(function(nodeWithId) {
-			var id = nodeWithId.getAttribute('id'),
-				newId = prefix + '-' + id;
-			nodeWithId.setAttribute('id', newId);
-
-			var attributesUsingId = xpath.select("//attribute::*[contains(., 'url(#" + id + ")')]", targetDoc);
-			attributesUsingId.forEach(function(attributeUsingId) {
-				attributeUsingId.value = "url(#" + newId + ")";
-			});
-		});
-	}
-
 	var markup = new xmldom.XMLSerializer().serializeToString(targetDoc);
 	return 'module.exports = ' + JSON.stringify(markup);
 };
